@@ -1,66 +1,133 @@
 <!DOCTYPE html>
-<html  xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <title>Student Management System</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
-          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .navbar {
+            background-color: #2c3e50;
+        }
+        .navbar-brand, .nav-link {
+            color: white !important;
+        }
+        .table-container {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            padding: 20px;
+            margin-top: 20px;
+        }
+        .btn-action {
+            margin: 0 5px;
+        }
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .user-avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        .user-info {
+            display: flex;
+            align-items: center;
+            color: white;
+            margin-right: 15px;
+        }
+        .user-name {
+            margin-bottom: 0;
+            font-size: 0.9rem;
+        }
+        .nav-divider {
+            border-left: 1px solid rgba(255,255,255,0.3);
+            height: 30px;
+            margin: 0 15px;
+        }
+    </style>
 </head>
-<body>
-<nav class="navbar navbar-expand-md bg-dark navbar-dark">
-    <!-- Brand -->
-    <a class="navbar-brand" href="#">Student Management System</a>
-
-    <!-- Toggler/collapsibe Button -->
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
-        <span class="navbar-toggler-icon"></span>
-    </button>
-
-    <!-- Navbar links -->
-    <div class="collapse navbar-collapse" id="collapsibleNavbar">
-        <ul class="navbar-nav">
-            <li class="nav-item">
-                <a class="nav-link" th:href="@{/students}">Student Management</a>
-            </li>
-
-        </ul>
-    </div>
-</nav>
-    <div class="container">
-        <div class = "row">
-            <h1>List Students</h1>
-        </div>
-        <div class="row">
-            <div class="col-lg-3">
-                <a   th:href="@{/students/new}" class="btn btn-primary btn-sm mb-3">Add student</a>
-
+<body class="bg-light">
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-graduation-cap me-2"></i>
+                Student Management System
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <li class="nav-item">
+                        <div class="user-info">
+                            <img th:src="@{https://ui-avatars.com/api/(name=${#authentication.principal.username},background=random)}" 
+                                 alt="User Avatar" class="user-avatar">
+                            <div>
+                                <p class="user-name" th:text="${#authentication.principal.username}">Username</p>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="nav-item">
+                        <div class="nav-divider"></div>
+                    </li>
+                    <li class="nav-item">
+                        <form th:action="@{/logout}" method="post" class="d-inline">
+                            <button type="submit" class="btn btn-outline-light">
+                                <i class="fas fa-sign-out-alt me-2"></i>Logout
+                            </button>
+                        </form>
+                    </li>
+                </ul>
             </div>
-
         </div>
-        <table class="table table-striped table-bordered">
-            <thead class="table-dark">
-            <tr>
-                <th>Student First Name</th>
-                <th>Student Last Name</th>
-                <th>Student Email</th>
-                <th>Actions</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="student: ${students}">
-                <td th:text="${student.firstName}"></td>
-                <td th:text="${student.lastName}"></td>
-                <td th:text="${student.email}"></td>
-                <td>
-                    <a th:href="@{students/edit/{id}(id =${student.id})}" class="btn btn-primary">Update</a>
-                    <a th:href="@{students/{id}(id =${student.id})}" class="btn btn-danger">Delete</a>
-                </td>
-            </tr>
-            </tbody>
-        </table>
+    </nav>
 
+    <div class="container">
+        <div class="table-container">
+            <div class="page-header">
+                <h2><i class="fas fa-users me-2"></i>Students List</h2>
+                <a th:href="@{/students/new}" class="btn btn-primary">
+                    <i class="fas fa-plus me-2"></i>Add New Student
+                </a>
+            </div>
+            
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>First Name</th>
+                            <th>Last Name</th>
+                            <th>Email</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="student : ${students}">
+                            <td th:text="${student.firstName}"></td>
+                            <td th:text="${student.lastName}"></td>
+                            <td th:text="${student.email}"></td>
+                            <td>
+                                <a th:href="@{/students/edit/{id}(id=${student.id})}" class="btn btn-warning btn-sm btn-action">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a th:href="@{/students/{id}(id=${student.id})}" class="btn btn-danger btn-sm btn-action"
+                                   onclick="return confirm('Are you sure you want to delete this student?')">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
